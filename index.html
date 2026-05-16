@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>THE (AZGARDIANZ) — Guild Dashboard</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.tab-btn{background:transparent;color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.15);padding:7px 16px;border-radius:6px;cursor:pointer;font-size:13px;transition:all .15s}
+.tab-btn.active{background:rgba(255,255,255,0.18);color:#fff;border-color:rgba(255,255,255,0.38)}
+th{padding:10px 14px;text-align:left;color:var(--color-text-secondary);font-weight:500;white-space:nowrap;font-size:12px}
+td{padding:9px 14px;font-size:13px;border-top:0.5px solid var(--color-border-tertiary)}
+tr:hover td{background:var(--color-background-secondary)}
+input,select{width:100%;padding:8px 10px;border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary);font-size:14px}
+.field-label{font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:4px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:16px}
+.card-header{padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary);font-weight:500;font-size:15px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.troop-cell{background:linear-gradient(90deg,rgba(201,168,76,0.12) 0%,rgba(201,168,76,0.04) 100%);border-left:2px solid #c9a84c}
+.troop-val{font-size:15px;font-weight:600;color:#c9a84c;letter-spacing:.3px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN MODAL -->
+<div id="loginOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:999;align-items:center;justify-content:center">
+  <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:32px;width:320px;max-width:90vw">
+    <div style="text-align:center;margin-bottom:24px">
+      <div style="font-size:28px;margin-bottom:8px">🔐</div>
+      <h2 style="font-size:17px;font-weight:600">CMS Admin Login</h2>
+      <p style="font-size:13px;color:var(--color-text-secondary);margin-top:4px">Restricted access — admins only</p>
+    </div>
+    <div style="margin-bottom:12px">
+      <label class="field-label">Username</label>
+      <input id="loginUser" type="text" placeholder="Enter username" autocomplete="off">
+    </div>
+    <div style="margin-bottom:6px">
+      <label class="field-label">Password</label>
+      <div style="position:relative">
+        <input id="loginPass" type="password" placeholder="Enter password" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+        <button onclick="togglePw()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--color-text-secondary);font-size:14px" id="eyeBtn">👁</button>
+      </div>
+    </div>
+    <div id="loginErr" style="font-size:12px;color:#c0392b;min-height:18px;margin-bottom:10px"></div>
+    <button onclick="doLogin()" style="width:100%;background:linear-gradient(135deg,#0c2a50,#0f3460);color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:500">Login</button>
+    <button onclick="closeLogin()" style="width:100%;background:none;border:none;color:var(--color-text-secondary);padding:8px;cursor:pointer;font-size:13px;margin-top:6px">Cancel</button>
+  </div>
+</div>
+
+<div id="root" style="padding:0 0 2rem">
+
+<!-- HEADER -->
+
+<div style="background:linear-gradient(135deg,#0a0f1e 0%,#141d35 50%,#0c2a50 100%);padding:20px 24px;border-radius:var(--border-radius-lg);margin-bottom:1.5rem">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="color:#c9a84c;font-size:10px;letter-spacing:3px;text-transform:uppercase;margin-bottom:5px">⚔ Guild Dashboard · Top Hero</div>
+      <h1 style="color:#fff;font-size:22px;font-weight:700;letter-spacing:.5px">THE <span style="color:#c9a84c">(AZGARDIANZ)</span></h1>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="tab-btn active" id="t-overview" onclick="showTab('overview')">📊 Overview</button>
+      <button class="tab-btn" id="t-ranking" onclick="showTab('ranking')">🏆 Ranking</button>
+      <button class="tab-btn" id="t-cms" onclick="clickCMS()">⚙ CMS</button>
+      <span id="adminBadge" style="display:none;background:rgba(201,168,76,0.2);color:#c9a84c;font-size:11px;padding:4px 10px;border-radius:10px;border:1px solid rgba(201,168,76,0.4)">Admin ✓</span>
+      <button id="logoutBtn" onclick="logout()" style="display:none;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.15);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px">Logout</button>
+    </div>
+  </div>
+</div>
+
+<!-- OVERVIEW -->
+<div id="tab-overview">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:1.5rem" id="statCards"></div>
+  <div class="card">
+    <div class="card-header">
+      <span>All Members</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <select id="filterTroop" onchange="renderTable()" style="width:auto;font-size:13px;padding:5px 10px">
+          <option value="">All Factions</option>
+          <option value="League">⚔ League</option>
+          <option value="Horde">🔥 Horde</option>
+          <option value="Nature">🌿 Nature</option>
+          <option value="N/A">— N/A</option>
+        </select>
+        <select id="sortBy" onchange="renderTable()" style="width:auto;font-size:13px;padding:5px 10px">
+          <option value="power">Sort: Total Power</option>
+          <option value="mainTroop">Sort: Main Troop</option>
+          <option value="castle">Sort: Castle Lv.</option>
+          <option value="name">Sort: Name A–Z</option>
+        </select>
+      </div>
+    </div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse">
+        <thead style="background:var(--color-background-secondary)">
+          <tr>
+            <th>#</th><th>Player</th>
+            <th style="text-align:right">Total Power</th>
+            <th style="text-align:center">Castle</th>
+            <th style="text-align:right;border-left:2px solid #c9a84c;padding-left:16px"><span style="color:#c9a84c">★ Main Troop</span></th>
+            <th style="text-align:center">Faction</th>
+            <th style="text-align:center">Updated</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- RANKING -->
+<div id="tab-ranking" style="display:none">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px" id="rankingGrid"></div>
+</div>
+
+<!-- CMS -->
+<div id="tab-cms" style="display:none">
+  <div class="card" style="overflow:visible">
+    <div class="card-header">
+      Update Player Data
+      <span style="font-size:12px;background:rgba(201,168,76,0.15);color:#c9a84c;padding:3px 10px;border-radius:8px;border:1px solid rgba(201,168,76,0.3)">🔐 Admin Mode</span>
+    </div>
+    <div style="padding:16px 20px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+        <div><label class="field-label">Player</label>
+          <select id="cmsPlayer" onchange="prefillPlayer()" style="width:100%"></select>
+        </div>
+        <div><label class="field-label">Faction (Main Troop)</label>
+          <select id="cmsTroop" style="width:100%">
+            <option value="N/A">— N/A (not set)</option>
+            <option value="League">⚔ League</option>
+            <option value="Horde">🔥 Horde</option>
+            <option value="Nature">🌿 Nature</option>
+          </select>
+        </div>
+        <div><label class="field-label">Total Power (M)</label>
+          <input id="cmsPower" type="number" step="0.01" placeholder="e.g. 25.4">
+        </div>
+        <div><label class="field-label">Main Troop Power (M)</label>
+          <input id="cmsMainTroop" type="number" step="0.01" placeholder="e.g. 10.3">
+        </div>
+        <div><label class="field-label">Castle Level</label>
+          <input id="cmsCastle" type="number" placeholder="e.g. 37">
+        </div>
+        <div><label class="field-label">Update Date</label>
+          <input id="cmsDate" type="date">
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="savePlayer()" style="background:#0c2a50;color:#fff;border:none;padding:9px 22px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:500">💾 Save Changes</button>
+        <button onclick="addNewPlayer()" style="background:var(--color-background-secondary);color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);padding:9px 22px;border-radius:6px;cursor:pointer;font-size:14px">➕ Add New Player</button>
+        <button onclick="deletePlayer()" style="background:var(--color-background-secondary);color:#c0392b;border:0.5px solid #c0392b55;padding:9px 22px;border-radius:6px;cursor:pointer;font-size:14px">🗑 Delete Player</button>
+      </div>
+      <div id="saveMsg" style="margin-top:10px;font-size:13px;color:var(--color-text-success);min-height:18px"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">Export / Import Data</div>
+    <div style="padding:16px 20px">
+      <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px">Export JSON → share with team → they import to sync.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="exportData()" style="background:var(--color-background-secondary);color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);padding:9px 20px;border-radius:6px;cursor:pointer;font-size:14px">📤 Export JSON</button>
+        <label style="background:var(--color-background-secondary);color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);padding:9px 20px;border-radius:6px;cursor:pointer;font-size:14px;display:inline-block">
+          📥 Import JSON<input type="file" accept=".json" onchange="importData(event)" style="display:none;width:auto">
+        </label>
+        <button onclick="resetToDefault()" style="background:var(--color-background-secondary);color:#c0392b;border:0.5px solid #c0392b44;padding:9px 20px;border-radius:6px;cursor:pointer;font-size:14px">↩ Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <span>Power Update History</span>
+      <select id="historyPlayer" onchange="renderHistory()" style="width:auto;font-size:13px;padding:5px 10px"></select>
+    </div>
+    <div style="padding:16px 20px" id="historyPanel">
+      <p style="font-size:13px;color:var(--color-text-secondary)">Select a player to view their power history.</p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+// ─── AUTH ───────────────────────────────────────────
+const CREDS={user:'admin',pass:'azgardianz@update'};
+let isAdmin=false;
+
+function clickCMS(){
+  if(isAdmin){showTab('cms');}
+  else{openLogin();}
+}
+function openLogin(){
+  document.getElementById('loginOverlay').style.display='flex';
+  document.getElementById('loginUser').value='';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginErr').textContent='';
+  setTimeout(()=>document.getElementById('loginUser').focus(),100);
+}
+function closeLogin(){document.getElementById('loginOverlay').style.display='none';}
+function togglePw(){
+  const inp=document.getElementById('loginPass');
+  inp.type=inp.type==='password'?'text':'password';
+}
+function doLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  if(u===CREDS.user&&p===CREDS.pass){
+    isAdmin=true;
+    document.getElementById('loginOverlay').style.display='none';
+    document.getElementById('adminBadge').style.display='inline-block';
+    document.getElementById('logoutBtn').style.display='inline-block';
+    showTab('cms');
+  } else {
+    document.getElementById('loginErr').textContent='❌ Incorrect username or password';
+    document.getElementById('loginPass').value='';
+    document.getElementById('loginPass').focus();
+  }
+}
+function logout(){
+  isAdmin=false;
+  document.getElementById('adminBadge').style.display='none';
+  document.getElementById('logoutBtn').style.display='none';
+  showTab('overview');
+}
+
+// ─── DATA ───────────────────────────────────────────
+const INIT=[
+  {name:'ActualPear',power:14.7,castle:35,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Asap',power:14.3,castle:36,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'B4MTK',power:30.1,castle:37,mainTroop:10.3,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'BaBaVoss',power:12.4,castle:34,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'bacisiken',power:13.4,castle:37,mainTroop:8.47,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'bánh bao',power:10.2,castle:34,mainTroop:6.18,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'BigDaddy',power:21.4,castle:34,mainTroop:7.88,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'BOR',power:22.8,castle:37,mainTroop:8.04,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Bún Chả HN',power:18.4,castle:35,mainTroop:5.32,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Chachi',power:14.3,castle:36,mainTroop:5.41,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Chantal666',power:14.1,castle:27,mainTroop:4.15,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'ChipChip',power:4.12,castle:28,mainTroop:2.37,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Cò Pé Pé',power:20,castle:35,mainTroop:9.55,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Cods',power:15.8,castle:38,mainTroop:10.07,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'CrzySquirl',power:18.3,castle:34,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Dark Nun',power:16.7,castle:35,mainTroop:6.16,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Fluxer',power:19.6,castle:36,mainTroop:7.53,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Ghaad',power:17.2,castle:36,mainTroop:9,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Gigi',power:13.5,castle:36,mainTroop:6.98,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'hena',power:12.8,castle:33,mainTroop:5.11,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Heroone',power:13.9,castle:34,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'HoruX',power:10.4,castle:35,mainTroop:3.23,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Hugin',power:57.6,castle:40,mainTroop:27.7,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Jerryleed',power:14.3,castle:29,mainTroop:5.49,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'jupiter',power:6.76,castle:33,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Kayjin',power:26.8,castle:39,mainTroop:10.7,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Kelly Nhi',power:12.8,castle:32,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Kéo',power:15.9,castle:34,mainTroop:8.66,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'kimme',power:17.9,castle:36,mainTroop:7.41,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Leya',power:25.7,castle:37,mainTroop:11.2,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Link',power:11.1,castle:34,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Lord Azrae',power:11,castle:31,mainTroop:4.11,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Max Pink',power:16.1,castle:36,mainTroop:7.04,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Mocha',power:18.3,castle:36,mainTroop:8.16,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'MSGrey',power:17.5,castle:36,mainTroop:6.11,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Mulanz',power:22.6,castle:37,mainTroop:9.44,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Munin',power:21.1,castle:36,mainTroop:8.83,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'NINJAz',power:17.9,castle:35,mainTroop:6.24,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'nonno',power:10.6,castle:33,mainTroop:3.4,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'NtoxEK8n',power:31.1,castle:34,mainTroop:8.92,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Nurtune',power:7.59,castle:30,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Odin',power:25.1,castle:34,mainTroop:9.11,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Pamir Ata',power:31.8,castle:38,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Paradise',power:17.6,castle:37,mainTroop:9.44,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'PB17',power:13.8,castle:33,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Pin',power:19.4,castle:37,mainTroop:8.19,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'PLUTOV',power:19.9,castle:37,mainTroop:8.33,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'quangminh',power:17,castle:35,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Redwing',power:15.8,castle:35,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Renzu',power:24.4,castle:38,mainTroop:10.7,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Saps',power:22,castle:34,mainTroop:7.41,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Sasek',power:9.7,castle:32,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Shoojai',power:23.8,castle:37,mainTroop:10.8,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Silent90',power:10.9,castle:30,mainTroop:3.76,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Squishypoo',power:11.1,castle:35,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'STING SỮA',power:21.7,castle:37,mainTroop:8.8,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Sulanz',power:17.2,castle:36,mainTroop:8.29,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'tuyennokia',power:15.9,castle:34,mainTroop:6.07,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Ullr',power:11.2,castle:32,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Valenka',power:21.2,castle:36,mainTroop:8.38,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'valorant',power:17.2,castle:36,mainTroop:6.51,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Venzo',power:13.4,castle:33,mainTroop:4.01,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Vigdis',power:46.6,castle:40,mainTroop:19.7,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Vogc',power:23.9,castle:36,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Von',power:33.7,castle:39,mainTroop:14.6,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'VươngKaKa',power:20.1,castle:37,mainTroop:8.87,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'wesArthur',power:18.8,castle:35,mainTroop:6.36,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Wincesvlad',power:15.3,castle:37,mainTroop:8.43,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Yuzu',power:23.9,castle:38,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Zerubbabel',power:5.71,castle:30,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'ZeusPisot',power:14.7,castle:35,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'Zhenn',power:17.2,castle:36,mainTroop:7.93,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'zio',power:9.34,castle:34,mainTroop:4.94,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'zuzu',power:25.6,castle:36,mainTroop:10.05,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
+  {name:'시드니 Roy',power:7.15,castle:31,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]}
+];
+
+let players=[];
+function loadData(){const s=localStorage.getItem('azgardianz');players=s?JSON.parse(s):JSON.parse(JSON.stringify(INIT));}
+function saveData(){localStorage.setItem('azgardianz',JSON.stringify(players));}
+
+const TCOL={League:{bg:'#dbeafe',text:'#1d4ed8',icon:'⚔'},Horde:{bg:'#fee2e2',text:'#b91c1c',icon:'🔥'},Nature:{bg:'#dcfce7',text:'#15803d',icon:'🌿'},'N/A':{bg:'#f3f4f6',text:'#6b7280',icon:'—'}};
+function badge(t){const c=TCOL[t]||TCOL['N/A'];return `<span style="background:${c.bg};color:${c.text};padding:2px 10px;border-radius:10px;font-size:11px;font-weight:500">${c.icon} ${t}</span>`;}
+function medal(i){return['🥇','🥈','🥉'][i]||`<span style="color:var(--color-text-secondary);font-size:12px">#${i+1}</span>`;}
+
+function renderStats(){
+  const t=players.length,tp=players.reduce((s,p)=>s+p.power,0),avg=tp/t;
+  const byF={League:0,Horde:0,Nature:0,'N/A':0};
+  players.forEach(p=>{byF[p.troop]=(byF[p.troop]||0)+1;});
+  document.getElementById('statCards').innerHTML=`
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px">
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">Total Members</div>
+      <div style="font-size:26px;font-weight:500">${t}</div>
+    </div>
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px">
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">Guild Total Power</div>
+      <div style="font-size:26px;font-weight:500">${tp.toFixed(1)}<span style="font-size:13px;color:var(--color-text-secondary);margin-left:4px">M</span></div>
+    </div>
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px">
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">Avg Power / Member</div>
+      <div style="font-size:26px;font-weight:500">${avg.toFixed(1)}<span style="font-size:13px;color:var(--color-text-secondary);margin-left:4px">M</span></div>
+    </div>
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px">
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">Factions</div>
+      <div style="font-size:12px;margin-top:4px;display:flex;flex-direction:column;gap:3px">
+        <span style="color:#1d4ed8">⚔ League: ${byF.League}</span>
+        <span style="color:#b91c1c">🔥 Horde: ${byF.Horde}</span>
+        <span style="color:#15803d">🌿 Nature: ${byF.Nature}</span>
+        <span style="color:#6b7280">— N/A: ${byF['N/A']||0}</span>
+      </div>
+    </div>`;
+}
+
+function renderTable(){
+  const f=document.getElementById('filterTroop').value;
+  const s=document.getElementById('sortBy').value;
+  let d=[...players];
+  if(f) d=d.filter(p=>p.troop===f);
+  d.sort((a,b)=>s==='name'?a.name.localeCompare(b.name):s==='castle'?b.castle-a.castle:s==='mainTroop'?b.mainTroop-a.mainTroop:b.power-a.power);
+  const maxT=Math.max(...d.filter(p=>p.mainTroop>1).map(p=>p.mainTroop),1);
+  document.getElementById('tableBody').innerHTML=d.map((p,i)=>{
+    const hasT=p.mainTroop>1;
+    const pct=hasT?Math.round((p.mainTroop/maxT)*100):0;
+    const troopCell=hasT
+      ?`<td class="troop-cell" style="text-align:right;padding:0"><div style="padding:9px 14px 9px 16px"><span class="troop-val">${p.mainTroop.toFixed(2)}<span style="font-size:11px;font-weight:400;margin-left:2px;color:#b8943e">M</span></span><div style="margin-top:4px;height:3px;background:rgba(201,168,76,0.15);border-radius:2px;overflow:hidden"><div style="height:100%;width:${pct}%;background:#c9a84c;border-radius:2px"></div></div></div></td>`
+      :`<td class="troop-cell" style="text-align:right;padding:9px 14px 9px 16px"><span style="color:var(--color-text-secondary)">—</span></td>`;
+    return `<tr>
+      <td style="color:var(--color-text-secondary)">${i+1}</td>
+      <td style="font-weight:500">${p.name}</td>
+      <td style="text-align:right">${p.power.toFixed(2)}<span style="font-size:11px;color:var(--color-text-secondary);margin-left:2px">M</span></td>
+      <td style="text-align:center;color:var(--color-text-secondary)">${p.castle}</td>
+      ${troopCell}
+      <td style="text-align:center">${badge(p.troop)}</td>
+      <td style="text-align:center;font-size:12px;color:var(--color-text-secondary)">${p.lastUpdate||'—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderRanking(){
+  const top5T=[...players].sort((a,b)=>b.mainTroop-a.mainTroop).slice(0,5);
+  const top5P=[...players].sort((a,b)=>b.power-a.power).slice(0,5);
+  const top5G=[...players].filter(p=>p.history&&p.history.length>=1).map(p=>({...p,_g:p.power-(p.history[0]?.power||p.power)})).filter(p=>p._g>0).sort((a,b)=>b._g-a._g).slice(0,5);
+  function rc(title,rows,empty){
+    return `<div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden">
+      <div style="padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary);font-weight:500;font-size:15px">${title}</div>
+      ${rows.length?rows.map((p,i)=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 16px;${i?'border-top:0.5px solid var(--color-border-tertiary)':''}">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:18px;min-width:26px;text-align:center">${medal(i)}</span>
+            <div><div style="font-weight:500;font-size:14px">${p.name}</div><div style="margin-top:2px">${badge(p.troop)}</div></div>
+          </div>
+          <div style="text-align:right"><div style="font-weight:500;font-size:15px">${p._val}</div><div style="font-size:11px;color:var(--color-text-secondary)">${p._unit}</div></div>
+        </div>`).join(''):`<div style="padding:20px 16px;font-size:13px;color:var(--color-text-secondary)">${empty}</div>`}
+    </div>`;
+  }
+  document.getElementById('rankingGrid').innerHTML=
+    rc('🏆 Top 5 — Main Troop Power',top5T.map(p=>({...p,_val:p.mainTroop>1?p.mainTroop.toFixed(2)+' M':'N/A',_unit:'Main Troop'})),'No data')+
+    rc('⚡ Top 5 — Total Power',top5P.map(p=>({...p,_val:p.power.toFixed(2)+' M',_unit:'Total Power'})),'No data')+
+    rc('📈 Top 5 — Fastest Growing',top5G.map(p=>({...p,_val:'+'+p._g.toFixed(2)+' M',_unit:'growth since first record'})),'Save at least one update per player to start tracking.');
+}
+
+function populateDropdowns(){
+  const sorted=[...players].sort((a,b)=>a.name.localeCompare(b.name));
+  const opts=sorted.map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
+  document.getElementById('cmsPlayer').innerHTML=opts;
+  document.getElementById('historyPlayer').innerHTML=opts;
+}
+function prefillPlayer(){
+  const p=players.find(x=>x.name===document.getElementById('cmsPlayer').value);
+  if(!p)return;
+  document.getElementById('cmsTroop').value=p.troop;
+  document.getElementById('cmsPower').value=p.power;
+  document.getElementById('cmsMainTroop').value=p.mainTroop>1?p.mainTroop:'';
+  document.getElementById('cmsCastle').value=p.castle;
+  document.getElementById('cmsDate').value=new Date().toISOString().slice(0,10);
+}
+function savePlayer(){
+  const name=document.getElementById('cmsPlayer').value;
+  const idx=players.findIndex(p=>p.name===name);if(idx<0)return;
+  const op=players[idx].power,ot=players[idx].mainTroop;
+  const np=parseFloat(document.getElementById('cmsPower').value)||op;
+  const nt=parseFloat(document.getElementById('cmsMainTroop').value)||ot;
+  const date=document.getElementById('cmsDate').value||new Date().toISOString().slice(0,10);
+  if(!players[idx].history)players[idx].history=[];
+  players[idx].history.push({date:players[idx].lastUpdate,power:op,mainTroop:ot});
+  players[idx].power=np;players[idx].mainTroop=nt;
+  players[idx].castle=parseInt(document.getElementById('cmsCastle').value)||players[idx].castle;
+  players[idx].troop=document.getElementById('cmsTroop').value;
+  players[idx].lastUpdate=date;
+  saveData();renderStats();renderTable();renderHistory();
+  const msg=document.getElementById('saveMsg');
+  msg.textContent=`✓ ${name} saved successfully`;
+  setTimeout(()=>msg.textContent='',3000);
+}
+function addNewPlayer(){
+  const name=prompt('Enter new player name:');
+  if(!name||!name.trim())return;
+  if(players.find(p=>p.name===name.trim())){alert('Player already exists!');return;}
+  players.push({name:name.trim(),power:0,castle:1,mainTroop:1,troop:'N/A',lastUpdate:new Date().toISOString().slice(0,10),history:[]});
+  saveData();populateDropdowns();renderStats();renderTable();
+  document.getElementById('cmsPlayer').value=name.trim();prefillPlayer();
+}
+function deletePlayer(){
+  const name=document.getElementById('cmsPlayer').value;
+  if(!confirm(`Delete "${name}"? Cannot be undone.`))return;
+  players=players.filter(p=>p.name!==name);
+  saveData();populateDropdowns();renderStats();renderTable();renderHistory();
+}
+function renderHistory(){
+  const sel=document.getElementById('historyPlayer');if(!sel)return;
+  const p=players.find(x=>x.name===sel.value);
+  const el=document.getElementById('historyPanel');
+  if(!p||!p.history||!p.history.length){el.innerHTML='<p style="font-size:13px;color:var(--color-text-secondary)">No history yet. Save an update to start tracking.</p>';return;}
+  const rows=[...p.history].reverse();
+  el.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13px">
+    <thead style="background:var(--color-background-secondary)"><tr><th>Date</th><th style="text-align:right">Power</th><th style="text-align:right">Main Troop</th><th style="text-align:right">Δ Power</th></tr></thead>
+    <tbody>${rows.map((h,i)=>{const prev=rows[i+1];const d=prev?+(h.power-prev.power).toFixed(2):null;const col=d>0?'#15803d':d<0?'#b91c1c':'var(--color-text-secondary)';
+      return `<tr><td style="padding:8px 14px;border-top:0.5px solid var(--color-border-tertiary)">${h.date}</td><td style="padding:8px 14px;border-top:0.5px solid var(--color-border-tertiary);text-align:right">${h.power.toFixed(2)} M</td><td style="padding:8px 14px;border-top:0.5px solid var(--color-border-tertiary);text-align:right">${h.mainTroop>1?h.mainTroop.toFixed(2)+' M':'—'}</td><td style="padding:8px 14px;border-top:0.5px solid var(--color-border-tertiary);text-align:right;color:${col}">${d!==null?(d>0?'+':'')+d:'—'}</td></tr>`;
+    }).join('')}</tbody></table>`;
+}
+function exportData(){const b=new Blob([JSON.stringify(players,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='azgardianz_data.json';a.click();}
+function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(!Array.isArray(d))throw 0;players=d;saveData();populateDropdowns();renderStats();renderTable();alert(`Imported ${players.length} players!`);}catch{alert('Invalid JSON.');}};r.readAsText(f);}
+function resetToDefault(){if(!confirm('Reset all data?'))return;players=JSON.parse(JSON.stringify(INIT));saveData();populateDropdowns();renderStats();renderTable();}
+
+function showTab(t){
+  ['overview','ranking','cms'].forEach(id=>{
+    document.getElementById('tab-'+id).style.display=id===t?'block':'none';
+    document.getElementById('t-'+id).classList.toggle('active',id===t);
+  });
+  if(t==='ranking')renderRanking();
+  if(t==='cms'){populateDropdowns();prefillPlayer();renderHistory();}
+}
+
+loadData();renderStats();renderTable();
+document.getElementById('cmsDate').value=new Date().toISOString().slice(0,10);
+</script>
+</body>
+</html>
