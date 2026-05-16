@@ -1,46 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>THE (AZGARDIANZ) — Guild Dashboard</title>
+
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f1117;color:#e8eaf0;min-height:100vh;padding:20px}
-  .tab-btn{background:transparent;color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.15);padding:7px 16px;border-radius:6px;cursor:pointer;font-size:13px;transition:all .15s}
-  .tab-btn.active{background:rgba(255,255,255,0.15);color:#fff;border-color:rgba(255,255,255,0.35)}
-  table{width:100%;border-collapse:collapse}
-  th{padding:10px 14px;text-align:left;color:#8b92a5;font-weight:500;font-size:12px;white-space:nowrap;background:#1a1d27}
-  td{padding:9px 14px;font-size:13px;border-top:1px solid #252836}
-  tr:hover td{background:#1e2130}
-  input,select{width:100%;padding:8px 10px;border-radius:6px;border:1px solid #2d3146;background:#1a1d27;color:#e8eaf0;font-size:14px}
-  input:focus,select:focus{outline:none;border-color:#c9a84c}
-  .field-label{font-size:12px;color:#8b92a5;display:block;margin-bottom:4px}
-  .card{background:#151821;border:1px solid #252836;border-radius:12px;overflow:hidden;margin-bottom:16px}
-  .card-header{padding:14px 16px;border-bottom:1px solid #252836;font-weight:500;font-size:15px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
-  .troop-cell{background:linear-gradient(90deg,rgba(201,168,76,0.1),transparent);border-left:2px solid #c9a84c}
-  .troop-val{font-size:15px;font-weight:600;color:#c9a84c}
-  .stat-card{background:#1a1d27;border:1px solid #252836;border-radius:10px;padding:14px 16px}
-  .stat-label{font-size:12px;color:#8b92a5;margin-bottom:6px}
-  .stat-val{font-size:26px;font-weight:500}
-  .btn-primary{background:linear-gradient(135deg,#0c2a50,#0f3460);color:#fff;border:none;padding:9px 22px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:500}
-  .btn-secondary{background:#1a1d27;color:#e8eaf0;border:1px solid #2d3146;padding:9px 22px;border-radius:6px;cursor:pointer;font-size:14px}
-  .btn-danger{background:#1a1d27;color:#e05252;border:1px solid rgba(224,82,82,0.35);padding:9px 22px;border-radius:6px;cursor:pointer;font-size:14px}
-  /* Login overlay */
-  #loginOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:999;align-items:center;justify-content:center}
-  #loginOverlay.show{display:flex}
-  .login-box{background:#151821;border:1px solid #2d3146;border-radius:14px;padding:32px;width:340px;max-width:90vw}
+*{box-sizing:border-box;margin:0;padding:0}
+.tab-btn{background:transparent;color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.15);padding:7px 16px;border-radius:6px;cursor:pointer;font-size:13px;transition:all .15s}
+.tab-btn.active{background:rgba(255,255,255,0.18);color:#fff;border-color:rgba(255,255,255,0.38)}
+th{padding:10px 14px;text-align:left;color:var(--color-text-secondary);font-weight:500;white-space:nowrap;font-size:12px}
+td{padding:9px 14px;font-size:13px;border-top:0.5px solid var(--color-border-tertiary)}
+tr:hover td{background:var(--color-background-secondary)}
+input,select{width:100%;padding:8px 10px;border-radius:6px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-secondary);color:var(--color-text-primary);font-size:14px}
+.field-label{font-size:12px;color:var(--color-text-secondary);display:block;margin-bottom:4px}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:16px}
+.card-header{padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary);font-weight:500;font-size:15px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.troop-cell{background:linear-gradient(90deg,rgba(201,168,76,0.12) 0%,rgba(201,168,76,0.04) 100%);border-left:2px solid #c9a84c}
+.troop-val{font-size:15px;font-weight:600;color:#c9a84c;letter-spacing:.3px}
 </style>
-</head>
-<body>
 
 <!-- LOGIN MODAL -->
-<div id="loginOverlay">
-  <div class="login-box">
+<div id="loginOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:999;display:flex;align-items:center;justify-content:center">
+  <div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:32px;width:320px;max-width:90vw">
     <div style="text-align:center;margin-bottom:24px">
-      <div style="font-size:32px;margin-bottom:10px">🔐</div>
-      <h2 style="font-size:18px;font-weight:600;color:#fff">CMS Admin Login</h2>
-      <p style="font-size:13px;color:#8b92a5;margin-top:4px">Restricted — admins only</p>
+      <div style="font-size:28px;margin-bottom:8px">🔐</div>
+      <h2 style="font-size:17px;font-weight:600">CMS Admin Login</h2>
+      <p style="font-size:13px;color:var(--color-text-secondary);margin-top:4px">Restricted access — admins only</p>
     </div>
     <div style="margin-bottom:12px">
       <label class="field-label">Username</label>
@@ -49,38 +29,38 @@
     <div style="margin-bottom:6px">
       <label class="field-label">Password</label>
       <div style="position:relative">
-        <input id="loginPass" type="password" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
-        <button onclick="togglePw()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#8b92a5;font-size:14px">👁</button>
+        <input id="loginPass" type="password" placeholder="Enter password" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
+        <button onclick="togglePw()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--color-text-secondary);font-size:14px" id="eyeBtn">👁</button>
       </div>
     </div>
-    <div id="loginErr" style="font-size:12px;color:#e05252;min-height:20px;margin-bottom:10px;padding-top:4px"></div>
-    <button onclick="doLogin()" class="btn-primary" style="width:100%;padding:11px">Login</button>
-    <button onclick="closeLogin()" style="width:100%;background:none;border:none;color:#8b92a5;padding:9px;cursor:pointer;font-size:13px;margin-top:6px">Cancel</button>
+    <div id="loginErr" style="font-size:12px;color:#c0392b;min-height:18px;margin-bottom:10px"></div>
+    <button onclick="doLogin()" style="width:100%;background:linear-gradient(135deg,#0c2a50,#0f3460);color:#fff;border:none;padding:10px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:500">Login</button>
+    <button onclick="closeLogin()" style="width:100%;background:none;border:none;color:var(--color-text-secondary);padding:8px;cursor:pointer;font-size:13px;margin-top:6px">Cancel</button>
   </div>
 </div>
 
-<div style="max-width:1200px;margin:0 auto">
+<div id="root" style="padding:0 0 2rem">
 
 <!-- HEADER -->
-<div style="background:linear-gradient(135deg,#0a0f1e 0%,#141d35 60%,#0c2a50 100%);padding:22px 26px;border-radius:14px;margin-bottom:20px;border:1px solid #1e2a45">
+<div style="background:linear-gradient(135deg,#0a0f1e 0%,#141d35 50%,#0c2a50 100%);padding:20px 24px;border-radius:var(--border-radius-lg);margin-bottom:1.5rem">
   <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
     <div>
-      <div style="color:#c9a84c;font-size:10px;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px">⚔ Guild Dashboard · Top Hero</div>
-      <h1 style="color:#fff;font-size:24px;font-weight:700;letter-spacing:.5px">THE <span style="color:#c9a84c">(AZGARDIANZ)</span></h1>
+      <div style="color:#c9a84c;font-size:10px;letter-spacing:3px;text-transform:uppercase;margin-bottom:5px">⚔ Guild Dashboard · Top Hero</div>
+      <h1 style="color:#fff;font-size:22px;font-weight:700;letter-spacing:.5px">THE <span style="color:#c9a84c">(AZGARDIANZ)</span></h1>
     </div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <div style="display:flex;gap:8px;align-items:center">
       <button class="tab-btn active" id="t-overview" onclick="showTab('overview')">📊 Overview</button>
       <button class="tab-btn" id="t-ranking" onclick="showTab('ranking')">🏆 Ranking</button>
       <button class="tab-btn" id="t-cms" onclick="clickCMS()">⚙ CMS</button>
-      <span id="adminBadge" style="display:none;background:rgba(201,168,76,0.15);color:#c9a84c;font-size:11px;padding:4px 10px;border-radius:10px;border:1px solid rgba(201,168,76,0.35)">Admin ✓</span>
-      <button id="logoutBtn" onclick="logout()" style="display:none;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.55);border:1px solid rgba(255,255,255,0.12);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px">Logout</button>
+      <span id="adminBadge" style="display:none;background:rgba(201,168,76,0.2);color:#c9a84c;font-size:11px;padding:4px 10px;border-radius:10px;border:1px solid rgba(201,168,76,0.4)">Admin ✓</span>
+      <button id="logoutBtn" onclick="logout()" style="display:none;background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.15);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px">Logout</button>
     </div>
   </div>
 </div>
 
 <!-- OVERVIEW -->
 <div id="tab-overview">
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px" id="statCards"></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:1.5rem" id="statCards"></div>
   <div class="card">
     <div class="card-header">
       <span>All Members</span>
@@ -101,8 +81,8 @@
       </div>
     </div>
     <div style="overflow-x:auto">
-      <table>
-        <thead>
+      <table style="width:100%;border-collapse:collapse">
+        <thead style="background:var(--color-background-secondary)">
           <tr>
             <th>#</th><th>Player</th>
             <th style="text-align:right">Total Power</th>
@@ -128,10 +108,10 @@
   <div class="card" style="overflow:visible">
     <div class="card-header">
       Update Player Data
-      <span style="font-size:12px;background:rgba(201,168,76,0.12);color:#c9a84c;padding:3px 10px;border-radius:8px;border:1px solid rgba(201,168,76,0.25)">🔐 Admin Mode</span>
+      <span style="font-size:12px;background:rgba(201,168,76,0.15);color:#c9a84c;padding:3px 10px;border-radius:8px;border:1px solid rgba(201,168,76,0.3)">🔐 Admin Mode</span>
     </div>
-    <div style="padding:18px 20px">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+    <div style="padding:16px 20px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
         <div><label class="field-label">Player</label>
           <select id="cmsPlayer" onchange="prefillPlayer()" style="width:100%"></select>
         </div>
@@ -157,24 +137,24 @@
         </div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button onclick="savePlayer()" class="btn-primary">💾 Save Changes</button>
-        <button onclick="addNewPlayer()" class="btn-secondary">➕ Add New Player</button>
-        <button onclick="deletePlayer()" class="btn-danger">🗑 Delete Player</button>
+        <button onclick="savePlayer()" style="background:#0c2a50;color:#fff;border:none;padding:9px 22px;border-radius:6px;cursor:pointer;font-size:14px;font-weight:500">💾 Save Changes</button>
+        <button onclick="addNewPlayer()" style="background:var(--color-background-secondary);color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);padding:9px 22px;border-radius:6px;cursor:pointer;font-size:14px">➕ Add New Player</button>
+        <button onclick="deletePlayer()" style="background:var(--color-background-secondary);color:#c0392b;border:0.5px solid #c0392b55;padding:9px 22px;border-radius:6px;cursor:pointer;font-size:14px">🗑 Delete Player</button>
       </div>
-      <div id="saveMsg" style="margin-top:10px;font-size:13px;color:#4caf50;min-height:18px"></div>
+      <div id="saveMsg" style="margin-top:10px;font-size:13px;color:var(--color-text-success);min-height:18px"></div>
     </div>
   </div>
 
   <div class="card">
     <div class="card-header">Export / Import Data</div>
     <div style="padding:16px 20px">
-      <p style="font-size:13px;color:#8b92a5;margin-bottom:14px">Export JSON → share with team → they import to sync data across devices.</p>
+      <p style="font-size:13px;color:var(--color-text-secondary);margin-bottom:12px">Export JSON → share with team → they import to sync.</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button onclick="exportData()" class="btn-secondary">📤 Export JSON</button>
-        <label class="btn-secondary" style="display:inline-block;cursor:pointer">
+        <button onclick="exportData()" style="background:var(--color-background-secondary);color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);padding:9px 20px;border-radius:6px;cursor:pointer;font-size:14px">📤 Export JSON</button>
+        <label style="background:var(--color-background-secondary);color:var(--color-text-primary);border:0.5px solid var(--color-border-tertiary);padding:9px 20px;border-radius:6px;cursor:pointer;font-size:14px;display:inline-block">
           📥 Import JSON<input type="file" accept=".json" onchange="importData(event)" style="display:none;width:auto">
         </label>
-        <button onclick="resetToDefault()" class="btn-danger">↩ Reset to Default</button>
+        <button onclick="resetToDefault()" style="background:var(--color-background-secondary);color:#c0392b;border:0.5px solid #c0392b44;padding:9px 20px;border-radius:6px;cursor:pointer;font-size:14px">↩ Reset</button>
       </div>
     </div>
   </div>
@@ -185,38 +165,44 @@
       <select id="historyPlayer" onchange="renderHistory()" style="width:auto;font-size:13px;padding:5px 10px"></select>
     </div>
     <div style="padding:16px 20px" id="historyPanel">
-      <p style="font-size:13px;color:#8b92a5">Select a player to view their power history.</p>
+      <p style="font-size:13px;color:var(--color-text-secondary)">Select a player to view their power history.</p>
     </div>
   </div>
 </div>
 
-</div><!-- /max-width wrapper -->
+</div>
 
 <script>
-// ── AUTH ──────────────────────────────────────────────────
+// ─── AUTH ───────────────────────────────────────────
 const CREDS={user:'admin',pass:'azgardianz@update'};
 let isAdmin=false;
 
-function clickCMS(){isAdmin?showTab('cms'):openLogin();}
+function clickCMS(){
+  if(isAdmin){showTab('cms');}
+  else{openLogin();}
+}
 function openLogin(){
-  document.getElementById('loginOverlay').classList.add('show');
+  document.getElementById('loginOverlay').style.display='flex';
   document.getElementById('loginUser').value='';
   document.getElementById('loginPass').value='';
   document.getElementById('loginErr').textContent='';
   setTimeout(()=>document.getElementById('loginUser').focus(),100);
 }
-function closeLogin(){document.getElementById('loginOverlay').classList.remove('show');}
-function togglePw(){const i=document.getElementById('loginPass');i.type=i.type==='password'?'text':'password';}
+function closeLogin(){document.getElementById('loginOverlay').style.display='none';}
+function togglePw(){
+  const inp=document.getElementById('loginPass');
+  inp.type=inp.type==='password'?'text':'password';
+}
 function doLogin(){
   const u=document.getElementById('loginUser').value.trim();
   const p=document.getElementById('loginPass').value;
   if(u===CREDS.user&&p===CREDS.pass){
     isAdmin=true;
-    closeLogin();
+    document.getElementById('loginOverlay').style.display='none';
     document.getElementById('adminBadge').style.display='inline-block';
     document.getElementById('logoutBtn').style.display='inline-block';
     showTab('cms');
-  }else{
+  } else {
     document.getElementById('loginErr').textContent='❌ Incorrect username or password';
     document.getElementById('loginPass').value='';
     document.getElementById('loginPass').focus();
@@ -229,7 +215,7 @@ function logout(){
   showTab('overview');
 }
 
-// ── DATA ──────────────────────────────────────────────────
+// ─── DATA ───────────────────────────────────────────
 const INIT=[
   {name:'ActualPear',power:14.7,castle:35,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
   {name:'Asap',power:14.3,castle:36,mainTroop:1,troop:'N/A',lastUpdate:'2026-05-05',history:[]},
@@ -312,24 +298,36 @@ let players=[];
 function loadData(){const s=localStorage.getItem('azgardianz');players=s?JSON.parse(s):JSON.parse(JSON.stringify(INIT));}
 function saveData(){localStorage.setItem('azgardianz',JSON.stringify(players));}
 
-const TCOL={League:{bg:'#1e3a6e',text:'#93c5fd',icon:'⚔'},Horde:{bg:'#6e1e1e',text:'#fca5a5',icon:'🔥'},Nature:{bg:'#1e4a2e',text:'#86efac',icon:'🌿'},'N/A':{bg:'#2a2d3a',text:'#8b92a5',icon:'—'}};
+const TCOL={League:{bg:'#dbeafe',text:'#1d4ed8',icon:'⚔'},Horde:{bg:'#fee2e2',text:'#b91c1c',icon:'🔥'},Nature:{bg:'#dcfce7',text:'#15803d',icon:'🌿'},'N/A':{bg:'#f3f4f6',text:'#6b7280',icon:'—'}};
 function badge(t){const c=TCOL[t]||TCOL['N/A'];return `<span style="background:${c.bg};color:${c.text};padding:2px 10px;border-radius:10px;font-size:11px;font-weight:500">${c.icon} ${t}</span>`;}
-function medal(i){return['🥇','🥈','🥉'][i]||`<span style="color:#8b92a5;font-size:12px">#${i+1}</span>`;}
+function medal(i){return['🥇','🥈','🥉'][i]||`<span style="color:var(--color-text-secondary);font-size:12px">#${i+1}</span>`;}
 
 function renderStats(){
   const t=players.length,tp=players.reduce((s,p)=>s+p.power,0),avg=tp/t;
   const byF={League:0,Horde:0,Nature:0,'N/A':0};
   players.forEach(p=>{byF[p.troop]=(byF[p.troop]||0)+1;});
   document.getElementById('statCards').innerHTML=`
-    <div class="stat-card"><div class="stat-label">Total Members</div><div class="stat-val">${t}</div></div>
-    <div class="stat-card"><div class="stat-label">Guild Total Power</div><div class="stat-val">${tp.toFixed(1)}<span style="font-size:14px;color:#8b92a5;margin-left:4px">M</span></div></div>
-    <div class="stat-card"><div class="stat-label">Avg Power / Member</div><div class="stat-val">${avg.toFixed(1)}<span style="font-size:14px;color:#8b92a5;margin-left:4px">M</span></div></div>
-    <div class="stat-card"><div class="stat-label">Factions</div><div style="font-size:13px;margin-top:6px;display:flex;flex-direction:column;gap:4px">
-      <span style="color:#93c5fd">⚔ League: ${byF.League}</span>
-      <span style="color:#fca5a5">🔥 Horde: ${byF.Horde}</span>
-      <span style="color:#86efac">🌿 Nature: ${byF.Nature}</span>
-      <span style="color:#8b92a5">— N/A: ${byF['N/A']||0}</span>
-    </div></div>`;
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px">
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">Total Members</div>
+      <div style="font-size:26px;font-weight:500">${t}</div>
+    </div>
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px">
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">Guild Total Power</div>
+      <div style="font-size:26px;font-weight:500">${tp.toFixed(1)}<span style="font-size:13px;color:var(--color-text-secondary);margin-left:4px">M</span></div>
+    </div>
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px">
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">Avg Power / Member</div>
+      <div style="font-size:26px;font-weight:500">${avg.toFixed(1)}<span style="font-size:13px;color:var(--color-text-secondary);margin-left:4px">M</span></div>
+    </div>
+    <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px 16px">
+      <div style="font-size:12px;color:var(--color-text-secondary);margin-bottom:6px">Factions</div>
+      <div style="font-size:12px;margin-top:4px;display:flex;flex-direction:column;gap:3px">
+        <span style="color:#1d4ed8">⚔ League: ${byF.League}</span>
+        <span style="color:#b91c1c">🔥 Horde: ${byF.Horde}</span>
+        <span style="color:#15803d">🌿 Nature: ${byF.Nature}</span>
+        <span style="color:#6b7280">— N/A: ${byF['N/A']||0}</span>
+      </div>
+    </div>`;
 }
 
 function renderTable(){
@@ -342,17 +340,17 @@ function renderTable(){
   document.getElementById('tableBody').innerHTML=d.map((p,i)=>{
     const hasT=p.mainTroop>1;
     const pct=hasT?Math.round((p.mainTroop/maxT)*100):0;
-    const troopTd=hasT
-      ?`<td class="troop-cell" style="padding:0"><div style="padding:9px 14px 9px 16px;text-align:right"><span class="troop-val">${p.mainTroop.toFixed(2)}<span style="font-size:11px;font-weight:400;margin-left:2px;color:#b8943e">M</span></span><div style="margin-top:4px;height:3px;background:rgba(201,168,76,0.15);border-radius:2px"><div style="height:100%;width:${pct}%;background:#c9a84c;border-radius:2px"></div></div></div></td>`
-      :`<td class="troop-cell" style="text-align:right;padding:9px 14px 9px 16px"><span style="color:#8b92a5">—</span></td>`;
+    const troopCell=hasT
+      ?`<td class="troop-cell" style="text-align:right;padding:0"><div style="padding:9px 14px 9px 16px"><span class="troop-val">${p.mainTroop.toFixed(2)}<span style="font-size:11px;font-weight:400;margin-left:2px;color:#b8943e">M</span></span><div style="margin-top:4px;height:3px;background:rgba(201,168,76,0.15);border-radius:2px;overflow:hidden"><div style="height:100%;width:${pct}%;background:#c9a84c;border-radius:2px"></div></div></div></td>`
+      :`<td class="troop-cell" style="text-align:right;padding:9px 14px 9px 16px"><span style="color:var(--color-text-secondary)">—</span></td>`;
     return `<tr>
-      <td style="color:#8b92a5">${i+1}</td>
+      <td style="color:var(--color-text-secondary)">${i+1}</td>
       <td style="font-weight:500">${p.name}</td>
-      <td style="text-align:right">${p.power.toFixed(2)}<span style="font-size:11px;color:#8b92a5;margin-left:2px">M</span></td>
-      <td style="text-align:center;color:#8b92a5">${p.castle}</td>
-      ${troopTd}
+      <td style="text-align:right">${p.power.toFixed(2)}<span style="font-size:11px;color:var(--color-text-secondary);margin-left:2px">M</span></td>
+      <td style="text-align:center;color:var(--color-text-secondary)">${p.castle}</td>
+      ${troopCell}
       <td style="text-align:center">${badge(p.troop)}</td>
-      <td style="text-align:center;font-size:12px;color:#8b92a5">${p.lastUpdate||'—'}</td>
+      <td style="text-align:center;font-size:12px;color:var(--color-text-secondary)">${p.lastUpdate||'—'}</td>
     </tr>`;
   }).join('');
 }
@@ -362,16 +360,16 @@ function renderRanking(){
   const top5P=[...players].sort((a,b)=>b.power-a.power).slice(0,5);
   const top5G=[...players].filter(p=>p.history&&p.history.length>=1).map(p=>({...p,_g:p.power-(p.history[0]?.power||p.power)})).filter(p=>p._g>0).sort((a,b)=>b._g-a._g).slice(0,5);
   function rc(title,rows,empty){
-    return `<div class="card">
-      <div class="card-header">${title}</div>
+    return `<div style="background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden">
+      <div style="padding:14px 16px;border-bottom:0.5px solid var(--color-border-tertiary);font-weight:500;font-size:15px">${title}</div>
       ${rows.length?rows.map((p,i)=>`
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;${i?'border-top:1px solid #252836':''}">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 16px;${i?'border-top:0.5px solid var(--color-border-tertiary)':''}">
           <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:20px;min-width:28px;text-align:center">${medal(i)}</span>
-            <div><div style="font-weight:500;font-size:14px">${p.name}</div><div style="margin-top:3px">${badge(p.troop)}</div></div>
+            <span style="font-size:18px;min-width:26px;text-align:center">${medal(i)}</span>
+            <div><div style="font-weight:500;font-size:14px">${p.name}</div><div style="margin-top:2px">${badge(p.troop)}</div></div>
           </div>
-          <div style="text-align:right"><div style="font-weight:600;font-size:15px;color:#c9a84c">${p._val}</div><div style="font-size:11px;color:#8b92a5">${p._unit}</div></div>
-        </div>`).join(''):`<div style="padding:20px 16px;font-size:13px;color:#8b92a5">${empty}</div>`}
+          <div style="text-align:right"><div style="font-weight:500;font-size:15px">${p._val}</div><div style="font-size:11px;color:var(--color-text-secondary)">${p._unit}</div></div>
+        </div>`).join(''):`<div style="padding:20px 16px;font-size:13px;color:var(--color-text-secondary)">${empty}</div>`}
     </div>`;
   }
   document.getElementById('rankingGrid').innerHTML=
@@ -381,9 +379,10 @@ function renderRanking(){
 }
 
 function populateDropdowns(){
-  const s=[...players].sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
-  document.getElementById('cmsPlayer').innerHTML=s;
-  document.getElementById('historyPlayer').innerHTML=s;
+  const sorted=[...players].sort((a,b)=>a.name.localeCompare(b.name));
+  const opts=sorted.map(p=>`<option value="${p.name}">${p.name}</option>`).join('');
+  document.getElementById('cmsPlayer').innerHTML=opts;
+  document.getElementById('historyPlayer').innerHTML=opts;
 }
 function prefillPlayer(){
   const p=players.find(x=>x.name===document.getElementById('cmsPlayer').value);
@@ -430,17 +429,17 @@ function renderHistory(){
   const sel=document.getElementById('historyPlayer');if(!sel)return;
   const p=players.find(x=>x.name===sel.value);
   const el=document.getElementById('historyPanel');
-  if(!p||!p.history||!p.history.length){el.innerHTML='<p style="font-size:13px;color:#8b92a5">No history yet. Save an update to start tracking.</p>';return;}
+  if(!p||!p.history||!p.history.length){el.innerHTML='<p style="font-size:13px;color:var(--color-text-secondary)">No history yet. Save an update to start tracking.</p>';return;}
   const rows=[...p.history].reverse();
-  el.innerHTML=`<table style="font-size:13px">
-    <thead><tr><th>Date</th><th style="text-align:right">Power</th><th style="text-align:right">Main Troop</th><th style="text-align:right">Δ Power</th></tr></thead>
-    <tbody>${rows.map((h,i)=>{const prev=rows[i+1];const d=prev?+(h.power-prev.power).toFixed(2):null;const col=d>0?'#4caf50':d<0?'#e05252':'#8b92a5';
-      return `<tr><td style="padding:8px 14px;border-top:1px solid #252836">${h.date}</td><td style="padding:8px 14px;border-top:1px solid #252836;text-align:right">${h.power.toFixed(2)} M</td><td style="padding:8px 14px;border-top:1px solid #252836;text-align:right">${h.mainTroop>1?h.mainTroop.toFixed(2)+' M':'—'}</td><td style="padding:8px 14px;border-top:1px solid #252836;text-align:right;color:${col}">${d!==null?(d>0?'+':'')+d:'—'}</td></tr>`;
+  el.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:13px">
+    <thead style="background:var(--color-background-secondary)"><tr><th>Date</th><th style="text-align:right">Power</th><th style="text-align:right">Main Troop</th><th style="text-align:right">Δ Power</th></tr></thead>
+    <tbody>${rows.map((h,i)=>{const prev=rows[i+1];const d=prev?+(h.power-prev.power).toFixed(2):null;const col=d>0?'#15803d':d<0?'#b91c1c':'var(--color-text-secondary)';
+      return `<tr><td style="padding:8px 14px;border-top:0.5px solid var(--color-border-tertiary)">${h.date}</td><td style="padding:8px 14px;border-top:0.5px solid var(--color-border-tertiary);text-align:right">${h.power.toFixed(2)} M</td><td style="padding:8px 14px;border-top:0.5px solid var(--color-border-tertiary);text-align:right">${h.mainTroop>1?h.mainTroop.toFixed(2)+' M':'—'}</td><td style="padding:8px 14px;border-top:0.5px solid var(--color-border-tertiary);text-align:right;color:${col}">${d!==null?(d>0?'+':'')+d:'—'}</td></tr>`;
     }).join('')}</tbody></table>`;
 }
 function exportData(){const b=new Blob([JSON.stringify(players,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='azgardianz_data.json';a.click();}
 function importData(e){const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=ev=>{try{const d=JSON.parse(ev.target.result);if(!Array.isArray(d))throw 0;players=d;saveData();populateDropdowns();renderStats();renderTable();alert(`Imported ${players.length} players!`);}catch{alert('Invalid JSON.');}};r.readAsText(f);}
-function resetToDefault(){if(!confirm('Reset all data to defaults?'))return;players=JSON.parse(JSON.stringify(INIT));saveData();populateDropdowns();renderStats();renderTable();}
+function resetToDefault(){if(!confirm('Reset all data?'))return;players=JSON.parse(JSON.stringify(INIT));saveData();populateDropdowns();renderStats();renderTable();}
 
 function showTab(t){
   ['overview','ranking','cms'].forEach(id=>{
@@ -454,5 +453,3 @@ function showTab(t){
 loadData();renderStats();renderTable();
 document.getElementById('cmsDate').value=new Date().toISOString().slice(0,10);
 </script>
-</body>
-</html>
